@@ -5,9 +5,9 @@ const LEADERBOARD_KEY = 'leaderboard:global'
 async function incrementScore(req,res){
     try {
         const {points} = req.body
-        const userId = req.user?._id
+        const userId = req.user?.userId
 
-        if(typeof points!==Number){
+        if(typeof points!== 'number'){
             return res.status(400).json({error:'points must be a number'})
         }
 
@@ -40,7 +40,7 @@ async function getTopPlayers(req,res){
 
 async function getMyRank(req,res){
     try {
-        const userId = req.user?._id
+        const userId = req.user?.userId
 
         const rank = await redisClient.zRevRank(LEADERBOARD_KEY,userId)
         const score = await redisClient.zScore(LEADERBOARD_KEY,userId)

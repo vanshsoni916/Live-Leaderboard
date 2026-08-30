@@ -84,7 +84,7 @@ async function loginUser(req, res) {
             })
     }
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ $or: [{ username }, { email }] })
     if (!user) {
         return res.status(401).json({ error: "Invalid Credentials" })
     }
