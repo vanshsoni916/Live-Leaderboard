@@ -1,0 +1,6 @@
+<script src="http://localhost:5000/socket.io/socket.io.js"></script>
+<script>
+    const socket = io('http://localhost:5000')
+    socket.on('connect',()=>console.log('Connected:',socket.id));
+    socket.on('leaderboard:update',(data)=>console.log('Update:',data))
+</script>
