@@ -1,4 +1,5 @@
 import {redisClient} from '../config/redisClient.js'
+import { broadcastLeaderboardUpdate } from '../scokets/index.js'
 
 const LEADERBOARD_KEY = 'leaderboard:global'
 
@@ -12,6 +13,9 @@ async function incrementScore(req,res){
         }
 
         const newScore = await redisClient.zIncrBy(LEADERBOARD_KEY,points,userId)
+        
+        const io = req.app.get('io')
+        await broadcastLeaderboardUpdate(io)
         
         res.json({ userId, newScore });
     } catch (err) {
@@ -56,4 +60,33 @@ async function getMyRank(req,res){
     }
 }
 
-export {incrementScore,getTopPlayers,getMyRank}
+async function getNearbyRivals(req,res){
+    try {
+        const userId = req.user?.userId
+        if(!userId){
+
+        }
+
+        const range = req.query?.range || 2
+        const myRank = await redisClient.zRevRank(LEADERBOARD_KEY,userId)
+        if(!myRank){
+
+        }
+
+        const start = Math.max(0,myRank-range)
+        const end = myRank+range
+
+        const nearBy = await redisClient.zRangeWithScores(
+            LEADERBOARD_KEY,
+            start,
+            end,
+            {REV:true}
+        ) 
+
+        res.json({ myRank: myRank + 1, nearBy });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+export {incrementScore,getTopPlayers,getMyRank,getNearbyRivals}
