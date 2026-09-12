@@ -26,7 +26,7 @@ async function incrementScore(req,res){
 
 async function getTopPlayers(req,res){
     try {
-        const limit = req.query.limit
+        const limit = parseInt(req.query.limit) || 10;
 
         const results = await redisClient.zRangeWithScores(
             LEADERBOARD_KEY,
@@ -37,7 +37,6 @@ async function getTopPlayers(req,res){
 
         res.status(200).json({top:results})
     } catch (err) {
-        console.error(err)
         res.status(500).json({error:'Internal Server'})
     }
 }
