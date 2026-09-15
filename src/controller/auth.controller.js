@@ -105,7 +105,7 @@ async function loginUser(req, res) {
         .status(200)
         .cookie("token", token, options)
         .json({
-            username: user.username,
+            user: user,
             email: user.email
         })
     } catch (err) {
@@ -118,7 +118,38 @@ async function loginUser(req, res) {
     }
 }
 
+async function getCurrentUser(req,res){
+    try {
+        const userId = req.user?.userId
+        if(!userId){
+            return res.status(401).json({message:'User is not Authenticated'})
+        }
+
+        const user = await User.findById(userId).select('-passwordhash');
+        if(!user){
+            return res.status(400).json({message:'User not found'})
+        }
+
+        return res.status(200).json({user})
+    } catch (err) {
+        return res.status(500).json('Internal Server Error')
+    }
+}
+
+function logout(req,res){
+    res.clearCookie('token',{
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000
+    })
+
+    res.json({message:'Logout Successfully'})
+}
+
 export{
     registerUser,
-    loginUser
+    loginUser,
+    getCurrentUser,
+    logout
 }
