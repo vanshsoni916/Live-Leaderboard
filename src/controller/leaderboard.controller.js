@@ -63,13 +63,14 @@ async function getNearbyRivals(req,res){
     try {
         const userId = req.user?.userId
         if(!userId){
-
+            return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        const range = req.query?.range || 2
+        const range = parseInt(req.query?.range) || 2
         const myRank = await redisClient.zRevRank(LEADERBOARD_KEY,userId)
-        if(!myRank){
 
+        if(myRank===null){
+            return res.status(404).json({ error: 'User has no score yet' });
         }
 
         const start = Math.max(0,myRank-range)
