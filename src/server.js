@@ -5,7 +5,7 @@ import { connectRedis } from './config/redisClient.js'
 import http from 'http'
 import { connectDB } from './config/db.js'
 import cookieParser from 'cookie-parser'
-import { initSocket } from './scokets/index.js'
+import { initSocket, setupRedisAdapter } from './scokets/index.js'
 
 const app = express()
 app.use(cors({
@@ -31,12 +31,16 @@ const io = new Server(server, {
     }
 })
 
-initSocket(io)
-app.set('io', io)
 
 async function start() {
     await connectRedis()
     await connectDB()
+
+    initSocket(io)
+    await setupRedisAdapter(io)
+
+    app.set('io', io)
+    
     server.listen(process.env.PORT || 5000, () => {
         console.log(`Server is listening on port ${process.env.PORT || 5000}`)
     })
