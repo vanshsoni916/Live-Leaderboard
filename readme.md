@@ -2,11 +2,6 @@
  
 A real-time leaderboard built with Redis Sorted Sets, Node.js/Express, MongoDB, Socket.IO, and React. Scores update live across every connected client the moment anyone's rank changes — no polling, no manual refresh.
  
-## Demo
- 
-> _Add your deployed link and/or a demo GIF here once live._
- 
----
  
 ## Features
  
